@@ -1,0 +1,77 @@
+- name: 'Bootstrap the EC2'
+  hosts: localhost
+  become: yes
+  vars:
+    ip_address: "{{ ansible_default_ipv4.address }}"
+  tasks:
+    - name: 'Check for pre-requisites'
+      yum:
+        name: "{{ packages }}"
+        state: latest
+        update_cache: yes
+      vars:
+        packages:
+        - yum-utils
+        - amazon-linux-extras
+
+    - name: 'Install Docker'
+      shell: "amazon-linux-extras install docker -y"
+
+    - name: 'Enable and Start Docker service'
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: 'Download npm installer script for Amazon Linux'
+      become: no
+      get_url:
+        url: https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh
+        dest: /tmp/install.sh
+
+    - name: 'Install npm'
+      become: no
+      shell: 'cd /tmp && bash install.sh && . ~/.nvm/nvm.sh && nvm install node'
+
+    - name: 'Clone simple node app repository'
+      become: no
+      git:
+        repo: https://github.com/ShareTheMeal/simple-node-app.git
+        dest: /home/ec2-user/simple-node-app/
+
+    - name: 'Install node modules and start the application'
+      become: no
+      shell: 'cd /home/ec2-user/simple-node-app/ && npm install && npm start &'
+
+    - name: 'Create nginx directory'
+      file:
+        path: /home/ec2-user/nginx
+        state: directory
+
+    - name: 'Create nginx configuration file for exposing node app'
+      copy:
+        dest: '/home/ec2-user/nginx/default.conf'
+        content: |
+          server {
+            location / {
+              proxy_set_header Host $host;
+              proxy_set_header X-Real-IP $remote_addr;
+              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto $scheme;
+
+              proxy_pass http://{{ ip_address }}:8080;
+              }
+          }
+
+    - name: 'Create nginx docker file with new configuration'
+      copy:
+        dest: '/home/ec2-user/nginx/Dockerfile'
+        content: |
+          FROM nginx
+          COPY default.conf /etc/nginx/conf.d/default.conf
+
+    - name: 'Build new nginx docker image'
+      shell: 'cd /home/ec2-user/nginx/ && docker build -t nginx-stm .'
+
+    - name: 'Run nginx docker container'
+      shell: 'docker run --name nginx-stm -p 80:80 -d nginx-stm'
