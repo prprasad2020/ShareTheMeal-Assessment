@@ -32,6 +32,11 @@
         dest: /tmp/install.sh
         mode: u=rwx,g=r,o=x
 
+    - name: 'Create nvm directory'
+      file:
+        path: /root/.nvm/
+        state: directory
+
     - name: 'Install nvm'
       become: no
       shell: |
