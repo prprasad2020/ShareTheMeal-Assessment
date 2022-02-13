@@ -1,5 +1,5 @@
 #!/bin/bash
-sudo amazon-linux-extras install docker -y
-sudo service docker start
-sudo systemctl enable docker
-sudo usermod -a -G docker ec2-user
+sudo amazon-linux-extras install ansible2 -y
+cd /tmp
+wget https://raw.githubusercontent.com/prprasad2020/ShareTheMeal-Assessment/main/ansible/bootstrap-ansible.yml
+ansible-playbook /tmp/bootstrap-ansible.yml

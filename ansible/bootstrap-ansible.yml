@@ -13,6 +13,8 @@
         packages:
         - yum-utils
         - amazon-linux-extras
+        - git
+        ansible_python_interpreter: /usr/bin/python2
 
     - name: 'Install Docker'
       shell: "amazon-linux-extras install docker -y"
