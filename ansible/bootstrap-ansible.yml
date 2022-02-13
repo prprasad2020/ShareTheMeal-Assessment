@@ -26,23 +26,19 @@
         enabled: yes
 
     - name: 'Download npm installer script for Amazon Linux'
-      become: no
       get_url:
         url: https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh
         dest: /tmp/install.sh
 
     - name: 'Install npm'
-      become: no
       shell: 'cd /tmp && bash install.sh && . ~/.nvm/nvm.sh && nvm install node'
 
     - name: 'Clone simple node app repository'
-      become: no
       git:
         repo: https://github.com/ShareTheMeal/simple-node-app.git
         dest: /home/ec2-user/simple-node-app/
 
     - name: 'Install node modules and start the application'
-      become: no
       shell: 'cd /home/ec2-user/simple-node-app/ && npm install && npm start &'
 
     - name: 'Create nginx directory'
