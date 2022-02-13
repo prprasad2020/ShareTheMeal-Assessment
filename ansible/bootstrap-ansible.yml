@@ -30,8 +30,11 @@
         url: https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh
         dest: /tmp/install.sh
 
+    - name: 'Install nvm'
+      shell: 'cd /tmp && bash install.sh && sh ~/.nvm/nvm.sh'
+
     - name: 'Install npm'
-      shell: 'cd /tmp && bash install.sh && . ~/.nvm/nvm.sh && nvm install node'
+      shell: 'nvm install node'
 
     - name: 'Clone simple node app repository'
       git:
