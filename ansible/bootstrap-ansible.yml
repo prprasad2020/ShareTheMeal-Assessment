@@ -31,10 +31,15 @@
         dest: /tmp/install.sh
 
     - name: 'Install nvm'
-      shell: 'cd /tmp && bash install.sh && sh ~/.nvm/nvm.sh'
+      shell: |
+        cd /tmp 
+        bash install.sh 
+        sh ~/.nvm/nvm.sh
 
     - name: 'Install npm'
-      shell: 'nvm install node'
+      shell: |
+        source ~/.bashrc
+        nvm install node
 
     - name: 'Clone simple node app repository'
       git:
@@ -42,7 +47,11 @@
         dest: /home/ec2-user/simple-node-app/
 
     - name: 'Install node modules and start the application'
-      shell: 'cd /home/ec2-user/simple-node-app/ && npm install && npm start &'
+      shell: |
+        source ~/.bashrc
+        cd /home/ec2-user/simple-node-app/
+        npm install
+        npm start &
 
     - name: 'Create nginx directory'
       file:
