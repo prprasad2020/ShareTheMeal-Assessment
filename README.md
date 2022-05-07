@@ -1,4 +1,4 @@
-# ShareTheMeal Assessment
+# Terraform Assessment
 
 ### Summary
 
